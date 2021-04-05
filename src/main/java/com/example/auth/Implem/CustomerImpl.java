@@ -31,9 +31,7 @@ public class CustomerImpl implements CustomerServiceImpl {
 	public Customer getCustomerId(String idCustomer) {
 		Customer customer = new Customer();
 		Optional<Customer> customerOpt = customerRepository.findById(idCustomer);
-		if (customerOpt.isPresent()) {
-			customer = customerOpt.get();
-		}
+		customer = customerOpt.get();
 		return customer;
 	}
 
