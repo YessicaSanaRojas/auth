@@ -18,9 +18,10 @@ public class CustomerService {
 		customers.stream().forEach(cust -> customerServiceImpl.create(cust));
 	}
 	
-	public void getCustomers() {
+	public List<Customer> getCustomers() {
 		List<Customer> listCustomer = customerServiceImpl.getCustomer();
-		listCustomer.stream().forEach(cust -> System.out.println(cust.getFirstName() + " " + cust.getLastName()));
+		//listCustomer.stream().forEach(cust -> System.out.println(cust.getFirstName() + " " + cust.getLastName()));
+		return listCustomer;
 	}
 	
 	public Customer getCustomer(String custom) {

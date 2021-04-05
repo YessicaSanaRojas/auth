@@ -37,50 +37,36 @@ public class ActionsController {
 	@Autowired
 	private CustomerService customerService;
 	
-	@PostMapping("/user")
-	public User login(@RequestParam("user") String username) {
-		//System.out.println("login - UserController");
-		String token = getJWTToken(username);
-		User user = new User();
-		user.setUser(username);
-		user.setToken(token);		
-		return user;
+	@PostMapping("/token")
+	public ResponseEntity<?> login(@RequestParam("user") String username) {
 		
+		if (username.equals("UserAuth")) {
+			String token = getJWTToken(username);
+			User user = new User();
+			user.setUser(username);
+			user.setToken(token);	
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>("The user does not have access to token", HttpStatus.SERVICE_UNAVAILABLE);
+		}
 	}
 
-	private String getJWTToken(String username) {
-		//System.out.println("getJWTToken - UserController");
-		String secretKey = "mySecretKey";
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
-		
-		String token = Jwts
-				.builder()
-				.setId("softtekJWT")
-				.setSubject(username)
-				.claim("authorities",
-						grantedAuthorities.stream()
-								.map(GrantedAuthority::getAuthority)
-								.collect(Collectors.toList()))
-				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + 600000))
-				.signWith(SignatureAlgorithm.HS512,
-						secretKey.getBytes()).compact();
-
-		return "Bearer " + token;
-	}
-	
 	@PostMapping(path = "/createCustomers")
 	public ResponseEntity insertCustomers(@RequestBody List<Customer> customers) {
 		customerService.createCustomers(customers);
-		customerService.getCustomers();
 		return new ResponseEntity<>("Customers created sucessfull", HttpStatus.OK);
 	}
 	
+	@RequestMapping("/getCustomers")
+	public ResponseEntity<List<Customer>> getDataCustomer() {
+		List<Customer> customers = customerService.getCustomers();
+		return new ResponseEntity<>(customers, HttpStatus.OK);
+	}
+	
 	@RequestMapping("/getDataCustomer")
-	public ResponseEntity getDataCustomer(@RequestParam("IdCustomer") String idCustomer) {
+	public ResponseEntity<Customer> getDataCustomer(@RequestParam("IdCustomer") String idCustomer) {
 		Customer customer = customerService.getCustomer(idCustomer);
-		return new ResponseEntity<>("Data Customer Id " + idCustomer + ", " + 
-						     		customer.getFirstName() + " " + customer.getLastName(), HttpStatus.NOT_ACCEPTABLE);
+		return new ResponseEntity<>(customer, HttpStatus.OK);
 	}
 	
 	@RequestMapping("/getValidCredentials")
@@ -92,5 +78,25 @@ public class ActionsController {
 			return new ResponseEntity<>("User not Logged In" + " " + username + " - " + password, HttpStatus.OK);
 		}
 		
+	}
+	
+	private String getJWTToken(String username) {
+		String secretKey = "mySecretKey";
+		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
+		
+		String token = Jwts
+				.builder()
+				.setId("AuthJWT")
+				.setSubject(username)
+				.claim("authorities",
+						grantedAuthorities.stream()
+								.map(GrantedAuthority::getAuthority)
+								.collect(Collectors.toList()))
+				.setIssuedAt(new Date(System.currentTimeMillis()))
+				.setExpiration(new Date(System.currentTimeMillis() + 600000))
+				.signWith(SignatureAlgorithm.HS512,
+						secretKey.getBytes()).compact();
+
+		return "Auth " + token;
 	}
 }

@@ -3,14 +3,20 @@ package com.example.auth.model;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import com.sun.istack.NotNull;
+
 @Entity
 public class Customer {
 	
 	@Id
 	private String idUser;
+	@NotNull
 	private String firstName;
+	@NotNull
 	private String lastName;
+	@NotNull
 	private String email;
+	@NotNull
 	private String gender;
 	
 	public String getIdUser() {

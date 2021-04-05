@@ -20,12 +20,11 @@ import io.jsonwebtoken.Jwts;
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
 	private final String HEADER = "Authorization";
-	private final String PREFIX = "Bearer ";
+	private final String PREFIX = "Auth ";
 	private final String SECRET = "mySecretKey";
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-		//System.out.println("doFilterInternal - JWTAuthorizationFilter");
 		try {
 			if (existeJWTToken(request, response)) {
 				Claims claims = validateToken(request);
@@ -46,7 +45,6 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	}	
 
 	private Claims validateToken(HttpServletRequest request) {
-		//System.out.println("validateToken - JWTAuthorizationFilter");
 		String jwtToken = request.getHeader(HEADER).replace(PREFIX, "");
 		return Jwts.parser().setSigningKey(SECRET.getBytes()).parseClaimsJws(jwtToken).getBody();
 	}
@@ -57,7 +55,6 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	 * @param claims
 	 */
 	private void setUpSpringAuthentication(Claims claims) {
-		//System.out.println("setUpSpringAuthentication - JWTAuthorizationFilter");
 		@SuppressWarnings("unchecked")
 		List<String> authorities = (List) claims.get("authorities");
 
@@ -68,7 +65,6 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	}
 
 	private boolean existeJWTToken(HttpServletRequest request, HttpServletResponse res) {
-		//System.out.println("existeJWTToken - JWTAuthorizationFilter");
 		String authenticationHeader = request.getHeader(HEADER);
 		if (authenticationHeader == null || !authenticationHeader.startsWith(PREFIX))
 			return false;
